@@ -5,6 +5,7 @@ import sqlite3
 app = Flask(__name__)
 CORS(app)
 
+# 建立数据库的函数
 def init_db():
     conn = sqlite3.connect('users.db')
     c = conn.cursor()
@@ -19,12 +20,15 @@ def init_db():
     conn.commit()
     conn.close()
 
+# 🌟 核心修复：把调用放在这里，确保不管怎么启动，第一件事都是建好数据库表！
+init_db()
+
 @app.route('/api/register', methods=['POST'])
 def register():
     data = request.json
     username = data.get('username')
     password = data.get('password')
-    tier = data.get('tier', '未选择')
+    tier = data.get('tier', 'Unselected')
     try:
         conn = sqlite3.connect('users.db')
         c = conn.cursor()
@@ -61,7 +65,7 @@ def update_tier():
     conn.close()
     return jsonify({"status": "success"})
 
+# 本地测试用的保留入口，云端会自动忽略
 if __name__ == '__main__':
-    init_db()
     print("TRUST-EYE 后端已启动：http://127.0.0.1:5000")
     app.run(debug=True, port=5000)
